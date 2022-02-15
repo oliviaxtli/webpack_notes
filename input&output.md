@@ -97,8 +97,23 @@ __webpack_public_path__ = myRuntimePublicPath;
 
 ## 实战例子
 ```
+const isProd = process.env.NODE_ENV !== "development";
+const getDirNameByAppName = (appName: string) => appName.replace(/_app$/, "");
+const genProductionPublicPath = (__appName: string) => {
+    /* TODO: 此处修改在部署至生产环境时，要修改为正式的url */
+    /* TODO: 此处暂时硬编码为index.html所在目录为根目录，暂不考虑陈 federation module */
+    return 0 ? `../${getDirNameByAppName(__appName)}/` : "./";
+};
+
+publicPath() {
+            return isProd
+                ? genProductionPublicPath(appName)
+                : `//localhost:${this.port}`;
+        }
+```
+```
 const publicPath = isEnvProduction
-        ? env.publicPath
+        ? env.publicPath // 从上述publicPath()获取
         : `//localhost:${env.port}/`;
         
 module.exports = {  
