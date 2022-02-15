@@ -97,8 +97,13 @@ __webpack_public_path__ = myRuntimePublicPath;
 
 ## 实战例子
 ```
-entry: path.resolve(paths.appSrc, "index"),
- output: {
+const publicPath = isEnvProduction
+        ? env.publicPath
+        : `//localhost:${env.port}/`;
+        
+module.exports = {  
+    entry: path.resolve(paths.appSrc, "index"),
+    output: {
             // fixed: 用auto，在ie下会出现请求js的地址不正确的bug，必须要指定publicPath，不能用auto
             // publicPath 不指定protocol会导致webpack-dev-serve的HMR功能失效
             publicPath: isEnvProduction || isIE ? publicPath : "auto",
@@ -109,4 +114,5 @@ entry: path.resolve(paths.appSrc, "index"),
                 ? "static/js/[name].[contenthash:8].chunk.js"
                 : "static/js/[name].chunk.js",
         },
+}
 ```
