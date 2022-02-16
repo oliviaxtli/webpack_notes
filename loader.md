@@ -65,4 +65,191 @@ import Styles from '-!style-loader!css-loader?modules!./styles.css';
 ### loader特性
 - loader支持链式调用，链中的每个loader会将转换应用在已处理过的资源上。一组链式的 loader 将按照相反的顺序执行。链中的第一个 loader 将其结果（也就是应用过转换后的资源）传递给下一个 loader，依此类推。最后，链中的最后一个 loader，返回 webpack 所期望的 JavaScript。
 
-
+### 实战
+```
+module: {
+            rules: [
+                {
+                    test: /bootstrap\.tsx$/,
+                    use: [
+                        {
+                            loader: "bundle-loader",
+                            options: {
+                                lazy: true,
+                            },
+                        },
+                    ],
+                },
+                {
+                    test: /\.(ts|tsx)$/,
+                    loader: "babel-loader",
+                    // exclude: /node_modules/,
+                    options: {
+                        presets: [
+                            [
+                                "@babel/preset-env",
+                                {
+                                    useBuiltIns: "entry",
+                                    targets: {
+                                        ie: "11",
+                                    },
+                                    corejs: {
+                                        version: "3.10.1",
+                                        proposals: true,
+                                    },
+                                },
+                            ],
+                            "@babel/preset-react",
+                            "@babel/preset-typescript",
+                        ],
+                        plugins: [
+                            [
+                                "@babel/plugin-transform-runtime",
+                                {
+                                    corejs: false,
+                                },
+                            ],
+                            "@babel/plugin-proposal-class-properties",
+                            // Ant Design 按需加载
+                            [
+                                "import",
+                                {
+                                    libraryName: "antd",
+                                    libraryDirectory: "es",
+                                    style: true,
+                                },
+                            ],
+                            isEnvDevelopment &&
+                            !isIE &&
+                            isSingleModuleDev &&
+                            require.resolve("react-refresh/babel"),
+                        ].filter(Boolean),
+                    },
+                },
+                {
+                    test: /\.js$/,
+                    loader: "babel-loader",
+                    //fixed: 部分npm包的es6语法在IE11下报错，所以要做语法转换
+                    include: /@umijs|fast-deep-equal/,
+                    options: {
+                        presets: ["@babel/preset-env"],
+                    },
+                },
+                {
+                    test: /\.css$/,
+                    use: [{ loader: "style-loader" }, { loader: "css-loader" }],
+                },
+                {
+                    test: /\.less$/i,
+                    include: /node_modules/,
+                    use: [
+                        {
+                            loader: "style-loader",
+                            options: {
+                                insert: insertStyle,
+                            },
+                        },
+                        {
+                            loader: "css-loader",
+                        },
+                        {
+                            loader: "less-loader",
+                            options: {
+                                lessOptions: {
+                                    javascriptEnabled: true,
+                                },
+                            },
+                        },
+                    ],
+                },
+                {
+                    test: /\.less$/i,
+                    include: /ui_lib/,
+                    use: [
+                        {
+                            loader: "style-loader",
+                            options: {
+                                insert: insertStyle,
+                            },
+                        },
+                        {
+                            loader: "css-loader",
+                        },
+                        {
+                            loader: "less-loader",
+                            options: {
+                                lessOptions: {
+                                    javascriptEnabled: true,
+                                    modifyVars: customTheme,
+                                },
+                            },
+                        },
+                    ],
+                },
+                {
+                    test: /\.module\.less$/i,
+                    include: /src/,
+                    use: [
+                        {
+                            loader: "style-loader",
+                        },
+                        {
+                            loader: "css-loader",
+                            options: {
+                                modules: {
+                                    localIdentName:
+                                        "[name]__[local]--[hash:base64:5]",
+                                },
+                            },
+                        },
+                        {
+                            loader: "less-loader",
+                            options: {
+                                lessOptions: {
+                                    javascriptEnabled: true,
+                                    modifyVars: customTheme,
+                                },
+                            },
+                        },
+                    ],
+                },
+                {
+                    test: /\.(png|jpg|gif)$/i,
+                    type: "asset",
+                    parser: {
+                        dataUrlCondition: {
+                            maxSize: 4 /*kb */ * 1024,
+                        },
+                    },
+                    generator: {
+                        filename: "images/[name]__[hash:8][ext][query]",
+                    },
+                },
+                {
+                    test: /\.svg$/i,
+                    oneOf: [
+                        // 仅用于地图svg的加载
+                        {
+                            test: /\.map\.svg$/i,
+                            use: [
+                                {
+                                    loader: path.resolve(
+                                        __dirname,
+                                        "./map-svg-post-loader/src/index.js"
+                                    ),
+                                },
+                            ],
+                        },
+                        {
+                            test: /\.svg$/i,
+                            use: ["@svgr/webpack", "url-loader"],
+                        },
+                    ],
+                },
+                {
+                    test: /\.(ttf|otf)$/i,
+                    type: "asset/resource",
+                },
+            ],
+        },
+```
