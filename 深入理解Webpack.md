@@ -45,3 +45,9 @@ webpack热加载中利用了EventSource来进行通信。EventSource是服务器
 4. 客户端获取到hash，构造请求hot-update.json的ajax链接，获取成功后将hot-update.js插入到主文档中
 5. hot-update.js插入成功后，执行hotAPI的createRecord和reload方法，获取到（Vue/React）组件的render方法，重新render组件，继而实现UI无刷新更新
 
+## Webpack打包流程
+1. 读取入口文件
+2. 将源码转换成AST语法书树
+3. 深度遍历AST语法树，找到所有的依赖，并加入到一个数组中
+4. 将AST代码转换成JavaScript代码
+5. 编写require函数，自动执行所有依赖
