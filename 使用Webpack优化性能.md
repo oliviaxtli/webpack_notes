@@ -160,7 +160,7 @@ module.exports = {
         }
     }
 }
-å```a
+```
 splitChunks有如下几个属性：
 - chunks：对同步代码还是异步代码进行处理
 - minSize：拆分包的大小，至少为minSize。如果包的大小不超过minSize，这个包不会拆分
